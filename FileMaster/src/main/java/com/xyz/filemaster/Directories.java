@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Directories {
@@ -32,13 +33,13 @@ public class Directories {
         }
         return paths;
     }
-    private static ArrayList<String> listFilePaths(File file1) throws IOException {
+    private static List<String> listFilePaths(File file1, List<String> filePaths) throws IOException {
         boolean checkDirectory = file1.isDirectory();
         if (checkDirectory) {
             File[] children = file1.listFiles();
             for (File child : children) {
                 if (child.isDirectory())
-                    listFilePaths(child);
+                    listFilePaths(child, filePaths);
                 else
                     filePaths.add(child.getAbsolutePath());
             }
@@ -46,8 +47,8 @@ public class Directories {
         return filePaths;
     }
     private static String getNeededPaths(File file1) throws IOException {
-        paths = new ArrayList<>();
-        ArrayList<String> fullPaths = listPaths(file1);
+        // Browser does not submit empty folder information. Ignore...
+        List<String> fullPaths = listFilePaths(file1, new ArrayList<>());
         String parentPath = file1.getAbsolutePath();
         String neededPaths = "";
         for (String path : fullPaths) {
@@ -86,7 +87,7 @@ public class Directories {
             return 0;
         }
     }
-    private static int dirCompare(ArrayList<String> paths1, ArrayList<String> paths2) throws IOException {
+    private static int dirCompare(List<String> paths1, List<String> paths2) throws IOException {
         Log log = new Log();
         boolean sameFiles = true;
         for (int i = 0; i < paths1.size(); i++){
@@ -133,6 +134,7 @@ public class Directories {
             log.print("The Directories are not same!");
             return 0;
         }
+
         if (checkType1 && checkType2) {
             System.out.println("Comparing Two Directories.... \n");
             String p1 = getNeededPaths(file1);
@@ -141,15 +143,11 @@ public class Directories {
                 log.print("The Directories are not same!");
                 return 0;
             }
-            paths = new ArrayList<>();
-            ArrayList<String> paths1 = listPaths(file1);
-            paths = new ArrayList<>();
-            ArrayList<String> paths2 = listPaths(file2);
-            ArrayList<String> filePaths1 = listFilePaths(file1);
-            filePaths = new ArrayList<>();
-            ArrayList<String> filPaths2 = listFilePaths(file2);
-            int len1 = paths1.size();
-            int len2 = paths2.size();
+
+            List<String> filePaths1 = listFilePaths(file1, new ArrayList<>());
+            List<String> filPaths2 = listFilePaths(file2, new ArrayList<>());
+            int len1 = filePaths1.size();
+            int len2 = filPaths2.size();
             if (len1 != len2) {
                 log.print("The Directories are not same!");
                 return 0;
